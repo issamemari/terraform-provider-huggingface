@@ -3,9 +3,11 @@ package provider
 import (
 	"context"
 	"fmt"
+	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/issamemari/huggingface-endpoints-client-go"
 )
@@ -80,6 +82,8 @@ func (r *endpointResource) Schema(_ context.Context, _ resource.SchemaRequest, r
 							},
 							"scale_to_zero_timeout": schema.Int64Attribute{
 								Optional: true,
+								Computed: true,
+								Default:  int64default.StaticInt64(15),
 							},
 						},
 					},
@@ -396,11 +400,17 @@ func (r *endpointResource) Read(ctx context.Context, req resource.ReadRequest, r
 
 	endpoint, err := r.client.GetEndpoint(state.Name.ValueString())
 	if err != nil {
-		resp.Diagnostics.AddError(
-			"error reading endpoint",
-			"could not read endpoint named "+state.Name.ValueString()+": "+err.Error(),
-		)
-		return
+		httpErr, ok := err.(*huggingface.HTTPError)
+		if ok && httpErr.StatusCode == http.StatusNotFound {
+			resp.State.RemoveResource(ctx)
+			return
+		} else {
+			resp.Diagnostics.AddError(
+				"error reading endpoint",
+				"could not read endpoint named "+state.Name.ValueString()+": "+err.Error(),
+			)
+			return
+		}
 	}
 
 	state = clientEndpointToProviderEndpoint(endpoint)
@@ -450,10 +460,14 @@ func (r *endpointResource) Delete(ctx context.Context, req resource.DeleteReques
 
 	err := r.client.DeleteEndpoint(state.Name.ValueString())
 	if err != nil {
-		resp.Diagnostics.AddError(
-			"error deleting endpoint",
-			err.Error(),
-		)
-		return
+		if httpErr, ok := err.(*huggingface.HTTPError); ok && httpErr.StatusCode != http.StatusNotFound {
+			resp.Diagnostics.AddError(
+				"error deleting endpoint",
+				err.Error(),
+			)
+			return
+		}
 	}
+
+	resp.State.RemoveResource(ctx)
 }

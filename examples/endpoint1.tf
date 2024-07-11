@@ -8,27 +8,19 @@ resource "huggingface_endpoint" "endpoint1" {
     scaling = {
       min_replica           = 0
       max_replica           = 1
-      scale_to_zero_timeout = 15
+      scale_to_zero_timout  = 30
     }
   }
 
   model = {
     framework = "pytorch"
     image = {
-      # custom = {
-      #   url          = "ghcr.io/huggingface/text-embeddings-inference:cpu-0.6.0"
-      #   health_route = "/health"
-      #   env          = {
-      #     MAX_BATCH_TOKENS        = 1000000
-      #     MAX_CONCURRENT_REQUESTS = 512
-      #     MODEL_ID                = "/repository"
-      #   }
-      # }
       huggingface = {
         env = {}
       }
     }
     repository = "sentence-transformers/all-MiniLM-L6-v2"
+    revision   = "e4ce9877abf3edfe10b0d82785e83bdcb973e22e"
     task       = "sentence-embeddings"
   }
 
