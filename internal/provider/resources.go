@@ -7,7 +7,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/issamemari/huggingface-endpoints-client-go"
 )
@@ -83,7 +82,6 @@ func (r *endpointResource) Schema(_ context.Context, _ resource.SchemaRequest, r
 							"scale_to_zero_timeout": schema.Int64Attribute{
 								Optional: true,
 								Computed: true,
-								Default:  int64default.StaticInt64(15),
 							},
 						},
 					},
@@ -196,6 +194,15 @@ func clientEndpointToProviderEndpoint(endpoint huggingface.EndpointDetails) endp
 		}
 	}
 
+	var timeout64 *int64
+	timeout := endpoint.Compute.Scaling.ScaleToZeroTimeout
+	if timeout == nil {
+		timeout64 = nil
+	} else {
+		timeoutInt := int64(*timeout)
+		timeout64 = &timeoutInt
+	}
+
 	providerEndpoint := endpointResourceModel{
 		AccountId: types.StringPointerValue(endpoint.AccountId),
 		Compute: Compute{
@@ -205,7 +212,7 @@ func clientEndpointToProviderEndpoint(endpoint huggingface.EndpointDetails) endp
 			Scaling: Scaling{
 				MaxReplica:         endpoint.Compute.Scaling.MaxReplica,
 				MinReplica:         endpoint.Compute.Scaling.MinReplica,
-				ScaleToZeroTimeout: endpoint.Compute.Scaling.ScaleToZeroTimeout,
+				ScaleToZeroTimeout: types.Int64PointerValue(timeout64),
 			},
 		},
 		Model: Model{
@@ -259,6 +266,14 @@ func providerEndpointToCreateEndpointRequest(endpoint endpointResourceModel) hug
 		}
 	}
 
+	var timeout *int
+	if endpoint.Compute.Scaling.ScaleToZeroTimeout.IsUnknown() || endpoint.Compute.Scaling.ScaleToZeroTimeout.IsNull() {
+		timeout = nil
+	} else {
+		timeoutInt := int(endpoint.Compute.Scaling.ScaleToZeroTimeout.ValueInt64())
+		timeout = &timeoutInt
+	}
+
 	huggingfaceEndpoint := huggingface.CreateEndpointRequest{
 		Name:      endpoint.Name.ValueString(),
 		AccountId: endpoint.AccountId.ValueStringPointer(),
@@ -269,7 +284,7 @@ func providerEndpointToCreateEndpointRequest(endpoint endpointResourceModel) hug
 			Scaling: huggingface.Scaling{
 				MaxReplica:         endpoint.Compute.Scaling.MaxReplica,
 				MinReplica:         endpoint.Compute.Scaling.MinReplica,
-				ScaleToZeroTimeout: endpoint.Compute.Scaling.ScaleToZeroTimeout,
+				ScaleToZeroTimeout: timeout,
 			},
 		},
 		Model: huggingface.Model{
@@ -314,6 +329,13 @@ func providerEndpointToUpdateEndpointRequest(endpoint endpointResourceModel) hug
 		}
 	}
 
+	var timeout *int
+	if endpoint.Compute.Scaling.ScaleToZeroTimeout.IsUnknown() || endpoint.Compute.Scaling.ScaleToZeroTimeout.IsNull() {
+		timeout = nil
+	} else {
+		timeoutInt := int(endpoint.Compute.Scaling.ScaleToZeroTimeout.ValueInt64())
+		timeout = &timeoutInt
+	}
 	huggingfaceEndpoint := huggingface.UpdateEndpointRequest{
 		Compute: &huggingface.Compute{
 			Accelerator:  endpoint.Compute.Accelerator,
@@ -322,7 +344,7 @@ func providerEndpointToUpdateEndpointRequest(endpoint endpointResourceModel) hug
 			Scaling: huggingface.Scaling{
 				MaxReplica:         endpoint.Compute.Scaling.MaxReplica,
 				MinReplica:         endpoint.Compute.Scaling.MinReplica,
-				ScaleToZeroTimeout: endpoint.Compute.Scaling.ScaleToZeroTimeout,
+				ScaleToZeroTimeout: timeout,
 			},
 		},
 		Model: &huggingface.Model{
