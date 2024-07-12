@@ -53,6 +53,9 @@ Required:
 
 - `max_replica` (Number)
 - `min_replica` (Number)
+
+Optional:
+
 - `scale_to_zero_timeout` (Number)
 
 
@@ -65,15 +68,43 @@ Required:
 - `framework` (String)
 - `image` (Attributes) (see [below for nested schema](#nestedatt--model--image))
 - `repository` (String)
-- `revision` (String)
 - `task` (String)
+
+Optional:
+
+- `revision` (String)
 
 <a id="nestedatt--model--image"></a>
 ### Nested Schema for `model.image`
 
+Optional:
+
+- `custom` (Attributes) (see [below for nested schema](#nestedatt--model--image--custom))
+- `huggingface` (Attributes) (see [below for nested schema](#nestedatt--model--image--huggingface))
+
+<a id="nestedatt--model--image--custom"></a>
+### Nested Schema for `model.image.custom`
+
 Required:
 
-- `huggingface` (Attributes) (see [below for nested schema](#nestedatt--model--image--huggingface))
+- `url` (String)
+
+Optional:
+
+- `credentials` (Attributes) (see [below for nested schema](#nestedatt--model--image--custom--credentials))
+- `env` (Map of String)
+- `health_route` (String)
+- `port` (Number)
+
+<a id="nestedatt--model--image--custom--credentials"></a>
+### Nested Schema for `model.image.custom.credentials`
+
+Required:
+
+- `password` (String)
+- `username` (String)
+
+
 
 <a id="nestedatt--model--image--huggingface"></a>
 ### Nested Schema for `model.image.huggingface`
