@@ -6,9 +6,9 @@ resource "huggingface_endpoint" "endpoint1" {
     instance_size = "x8"
     instance_type = "intel-icl"
     scaling = {
-      min_replica           = 0
-      max_replica           = 1
-      scale_to_zero_timout  = 30
+      min_replica          = 0
+      max_replica          = 1
+      scale_to_zero_timout = 30
     }
   }
 
