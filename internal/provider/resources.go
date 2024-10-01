@@ -128,6 +128,7 @@ func (r *endpointResource) Schema(_ context.Context, _ resource.SchemaRequest, r
 									},
 									"port": schema.Int64Attribute{
 										Optional: true,
+										Computed: true,
 									},
 									"url": schema.StringAttribute{
 										Required: true,
@@ -178,11 +179,19 @@ func clientEndpointToProviderEndpoint(endpoint huggingface.EndpointDetails) endp
 			},
 		}
 	} else if endpoint.Model.Image.Custom != nil {
+		var port64 *int64
+		port := endpoint.Model.Image.Custom.Port
+		if port == nil {
+			port64 = nil
+		} else {
+			portInt64 := int64(*port)
+			port64 = &portInt64
+		}
 		image = Image{
 			Custom: &Custom{
 				Env:         endpoint.Model.Image.Custom.Env,
 				HealthRoute: endpoint.Model.Image.Custom.HealthRoute,
-				Port:        endpoint.Model.Image.Custom.Port,
+				Port:        types.Int64PointerValue(port64),
 				URL:         endpoint.Model.Image.Custom.URL,
 			},
 		}
@@ -250,11 +259,18 @@ func providerEndpointToCreateEndpointRequest(endpoint endpointResourceModel) hug
 			},
 		}
 	} else if endpoint.Model.Image.Custom != nil {
+		var port *int
+		if endpoint.Model.Image.Custom.Port.IsUnknown() || endpoint.Model.Image.Custom.Port.IsNull() {
+			port = nil
+		} else {
+			portInt := int(endpoint.Model.Image.Custom.Port.ValueInt64())
+			port = &portInt
+		}
 		image = huggingface.Image{
 			Custom: &huggingface.Custom{
 				Env:         endpoint.Model.Image.Custom.Env,
 				HealthRoute: endpoint.Model.Image.Custom.HealthRoute,
-				Port:        endpoint.Model.Image.Custom.Port,
+				Port:        port,
 				URL:         endpoint.Model.Image.Custom.URL,
 			},
 		}
@@ -313,11 +329,18 @@ func providerEndpointToUpdateEndpointRequest(endpoint endpointResourceModel) hug
 			},
 		}
 	} else if endpoint.Model.Image.Custom != nil {
+		var port *int
+		if endpoint.Model.Image.Custom.Port.IsUnknown() || endpoint.Model.Image.Custom.Port.IsNull() {
+			port = nil
+		} else {
+			portInt := int(endpoint.Model.Image.Custom.Port.ValueInt64())
+			port = &portInt
+		}
 		image = huggingface.Image{
 			Custom: &huggingface.Custom{
 				Env:         endpoint.Model.Image.Custom.Env,
 				HealthRoute: endpoint.Model.Image.Custom.HealthRoute,
-				Port:        endpoint.Model.Image.Custom.Port,
+				Port:        port,
 				URL:         endpoint.Model.Image.Custom.URL,
 			},
 		}

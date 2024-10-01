@@ -44,7 +44,7 @@ type Custom struct {
 	Credentials *Credentials      `tfsdk:"credentials"`
 	Env         map[string]string `tfsdk:"env"`
 	HealthRoute *string           `tfsdk:"health_route"`
-	Port        *int              `tfsdk:"port"`
+	Port        types.Int64       `tfsdk:"port"`
 	URL         string            `tfsdk:"url"`
 }
 
