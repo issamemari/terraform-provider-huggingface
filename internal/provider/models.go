@@ -28,11 +28,12 @@ type Scaling struct {
 }
 
 type Model struct {
-	Framework  string       `tfsdk:"framework"`
-	Image      Image        `tfsdk:"image"`
-	Repository string       `tfsdk:"repository"`
-	Revision   types.String `tfsdk:"revision"`
-	Task       types.String `tfsdk:"task"`
+	Framework  string            `tfsdk:"framework"`
+	Image      Image             `tfsdk:"image"`
+	Repository string            `tfsdk:"repository"`
+	Revision   types.String      `tfsdk:"revision"`
+	Task       types.String      `tfsdk:"task"`
+	Env        map[string]string `tfsdk:"env"`
 }
 
 type Image struct {
@@ -102,11 +103,10 @@ type Tgi struct {
 }
 
 type Custom struct {
-	Credentials *Credentials      `tfsdk:"credentials"`
-	Env         map[string]string `tfsdk:"env"`
-	HealthRoute *string           `tfsdk:"health_route"`
-	Port        types.Int64       `tfsdk:"port"`
-	URL         string            `tfsdk:"url"`
+	Credentials *Credentials `tfsdk:"credentials"`
+	HealthRoute *string      `tfsdk:"health_route"`
+	Port        types.Int64  `tfsdk:"port"`
+	URL         string       `tfsdk:"url"`
 }
 
 type Credentials struct {
@@ -114,9 +114,7 @@ type Credentials struct {
 	Username string `tfsdk:"username"`
 }
 
-type Huggingface struct {
-	Env map[string]string `tfsdk:"env"`
-}
+type Huggingface struct{}
 
 type Cloud struct {
 	Region string `tfsdk:"region"`

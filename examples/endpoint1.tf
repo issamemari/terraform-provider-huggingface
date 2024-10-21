@@ -1,27 +1,31 @@
-resource "huggingface_endpoint" "endpoint1" {
-  name = "test-endpoint-issa1"
+resource "huggingface_endpoint" "enhanced_search_embedding" {
+  name = "enh-srch-embed-staging-us-cpu"
 
   compute = {
     accelerator   = "cpu"
-    instance_size = "x8"
+    instance_size = "x1"
     instance_type = "intel-icl"
     scaling = {
-      min_replica          = 0
-      max_replica          = 1
-      scale_to_zero_timout = 30
+      min_replica = 0
+      max_replica = 1
     }
   }
 
   model = {
     framework = "pytorch"
     image = {
-      huggingface = {
-        env = {}
+      custom = {
+        url = "ghcr.io/huggingface/text-embeddings-inference:cpu-0.6.0"
       }
     }
-    repository = "sentence-transformers/all-MiniLM-L6-v2"
-    revision   = "e4ce9877abf3edfe10b0d82785e83bdcb973e22e"
+    env = {
+      MAX_BATCH_TOKENS        = "1000000"
+      MAX_CONCURRENT_REQUESTS = "512"
+      MODEL_ID                = "/repository"
+    }
+    repository = "avsolatorio/GIST-Embedding-v0"
     task       = "sentence-embeddings"
+    revision   = "025ccf7d0a8f03dbd7cead428899acfdf6636432"
   }
 
   cloud = {
@@ -32,6 +36,6 @@ resource "huggingface_endpoint" "endpoint1" {
   type = "protected"
 }
 
-output "endpoint1" {
-  value = huggingface_endpoint.endpoint1
+output "enhanced_search_embedding" {
+  value = huggingface_endpoint.enhanced_search_embedding
 }

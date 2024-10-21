@@ -93,17 +93,15 @@ func (r *endpointResource) Schema(_ context.Context, _ resource.SchemaRequest, r
 					"framework": schema.StringAttribute{
 						Required: true,
 					},
+					"env": schema.MapAttribute{
+						Optional:    true,
+						ElementType: types.StringType,
+					},
 					"image": schema.SingleNestedAttribute{
 						Required: true,
 						Attributes: map[string]schema.Attribute{
 							"huggingface": schema.SingleNestedAttribute{
 								Optional: true,
-								Attributes: map[string]schema.Attribute{
-									"env": schema.MapAttribute{
-										Optional:    true,
-										ElementType: types.StringType,
-									},
-								},
 							},
 							"custom": schema.SingleNestedAttribute{
 								Optional: true,
@@ -118,10 +116,6 @@ func (r *endpointResource) Schema(_ context.Context, _ resource.SchemaRequest, r
 												Required: true,
 											},
 										},
-									},
-									"env": schema.MapAttribute{
-										Optional:    true,
-										ElementType: types.StringType,
 									},
 									"health_route": schema.StringAttribute{
 										Optional: true,
@@ -327,9 +321,7 @@ func clientEndpointToProviderEndpoint(endpoint huggingface.EndpointDetails) endp
 	var image Image
 	if endpoint.Model.Image.Huggingface != nil {
 		image = Image{
-			Huggingface: &Huggingface{
-				Env: endpoint.Model.Image.Huggingface.Env,
-			},
+			Huggingface: &Huggingface{},
 		}
 	} else if endpoint.Model.Image.Custom != nil {
 		var port64 *int64
@@ -342,7 +334,6 @@ func clientEndpointToProviderEndpoint(endpoint huggingface.EndpointDetails) endp
 		}
 		image = Image{
 			Custom: &Custom{
-				Env:         endpoint.Model.Image.Custom.Env,
 				HealthRoute: endpoint.Model.Image.Custom.HealthRoute,
 				Port:        types.Int64PointerValue(port64),
 				URL:         endpoint.Model.Image.Custom.URL,
@@ -468,6 +459,7 @@ func clientEndpointToProviderEndpoint(endpoint huggingface.EndpointDetails) endp
 			Repository: endpoint.Model.Repository,
 			Revision:   types.StringPointerValue(endpoint.Model.Revision),
 			Task:       types.StringPointerValue(endpoint.Model.Task),
+			Env:        endpoint.Model.Env,
 		},
 		Name: types.StringValue(endpoint.Name),
 		Cloud: Cloud{
@@ -477,12 +469,8 @@ func clientEndpointToProviderEndpoint(endpoint huggingface.EndpointDetails) endp
 		Type: types.StringValue(endpoint.Type),
 	}
 
-	if endpoint.Model.Image.Huggingface != nil && endpoint.Model.Image.Huggingface.Env == nil {
-		providerEndpoint.Model.Image.Huggingface.Env = make(map[string]string)
-	}
-
-	if endpoint.Model.Image.Custom != nil && endpoint.Model.Image.Custom.Env == nil {
-		providerEndpoint.Model.Image.Custom.Env = make(map[string]string)
+	if endpoint.Model.Env == nil {
+		providerEndpoint.Model.Env = make(map[string]string)
 	}
 
 	return providerEndpoint
@@ -492,9 +480,7 @@ func providerEndpointToCreateEndpointRequest(endpoint endpointResourceModel) hug
 	var image huggingface.Image
 	if endpoint.Model.Image.Huggingface != nil {
 		image = huggingface.Image{
-			Huggingface: &huggingface.Huggingface{
-				Env: endpoint.Model.Image.Huggingface.Env,
-			},
+			Huggingface: &huggingface.Huggingface{},
 		}
 	} else if endpoint.Model.Image.Custom != nil {
 		var port *int
@@ -506,7 +492,6 @@ func providerEndpointToCreateEndpointRequest(endpoint endpointResourceModel) hug
 		}
 		image = huggingface.Image{
 			Custom: &huggingface.Custom{
-				Env:         endpoint.Model.Image.Custom.Env,
 				HealthRoute: endpoint.Model.Image.Custom.HealthRoute,
 				Port:        port,
 				URL:         endpoint.Model.Image.Custom.URL,
@@ -628,6 +613,7 @@ func providerEndpointToCreateEndpointRequest(endpoint endpointResourceModel) hug
 			Repository: endpoint.Model.Repository,
 			Revision:   endpoint.Model.Revision.ValueStringPointer(),
 			Task:       endpoint.Model.Task.ValueStringPointer(),
+			Env:        endpoint.Model.Env,
 		},
 		Provider: huggingface.Provider{
 			Region: endpoint.Cloud.Region,
@@ -643,9 +629,7 @@ func providerEndpointToUpdateEndpointRequest(endpoint endpointResourceModel) hug
 	var image huggingface.Image
 	if endpoint.Model.Image.Huggingface != nil {
 		image = huggingface.Image{
-			Huggingface: &huggingface.Huggingface{
-				Env: endpoint.Model.Image.Huggingface.Env,
-			},
+			Huggingface: &huggingface.Huggingface{},
 		}
 	} else if endpoint.Model.Image.Custom != nil {
 		var port *int
@@ -657,7 +641,6 @@ func providerEndpointToUpdateEndpointRequest(endpoint endpointResourceModel) hug
 		}
 		image = huggingface.Image{
 			Custom: &huggingface.Custom{
-				Env:         endpoint.Model.Image.Custom.Env,
 				HealthRoute: endpoint.Model.Image.Custom.HealthRoute,
 				Port:        port,
 				URL:         endpoint.Model.Image.Custom.URL,
@@ -776,6 +759,7 @@ func providerEndpointToUpdateEndpointRequest(endpoint endpointResourceModel) hug
 			Repository: endpoint.Model.Repository,
 			Revision:   endpoint.Model.Revision.ValueStringPointer(),
 			Task:       endpoint.Model.Task.ValueStringPointer(),
+			Env:        endpoint.Model.Env,
 		},
 		Type: endpoint.Type.ValueStringPointer(),
 	}

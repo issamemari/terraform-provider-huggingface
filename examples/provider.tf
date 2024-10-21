@@ -1,8 +1,7 @@
 terraform {
   required_providers {
     huggingface = {
-      source  = "issamemari/huggingface"
-      version = "1.1.7"
+      source = "jesus/huggingface"
     }
   }
 }

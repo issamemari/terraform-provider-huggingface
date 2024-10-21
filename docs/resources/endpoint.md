@@ -72,6 +72,7 @@ Required:
 
 Optional:
 
+- `env` (Map of String)
 - `revision` (String)
 
 <a id="nestedatt--model--image"></a>
@@ -81,6 +82,11 @@ Optional:
 
 - `custom` (Attributes) (see [below for nested schema](#nestedatt--model--image--custom))
 - `huggingface` (Attributes) (see [below for nested schema](#nestedatt--model--image--huggingface))
+- `llamacpp` (Attributes) (see [below for nested schema](#nestedatt--model--image--llamacpp))
+- `tei` (Attributes) (see [below for nested schema](#nestedatt--model--image--tei))
+- `tgi` (Attributes) (see [below for nested schema](#nestedatt--model--image--tgi))
+- `tgi_neuron` (Attributes) (see [below for nested schema](#nestedatt--model--image--tgi_neuron))
+- `tgi_tpu` (Attributes) (see [below for nested schema](#nestedatt--model--image--tgi_tpu))
 
 <a id="nestedatt--model--image--custom"></a>
 ### Nested Schema for `model.image.custom`
@@ -92,7 +98,6 @@ Required:
 Optional:
 
 - `credentials` (Attributes) (see [below for nested schema](#nestedatt--model--image--custom--credentials))
-- `env` (Map of String)
 - `health_route` (String)
 - `port` (Number)
 
@@ -109,6 +114,93 @@ Required:
 <a id="nestedatt--model--image--huggingface"></a>
 ### Nested Schema for `model.image.huggingface`
 
+
+<a id="nestedatt--model--image--llamacpp"></a>
+### Nested Schema for `model.image.llamacpp`
+
+Required:
+
+- `model_path` (String)
+- `url` (String)
+
 Optional:
 
-- `env` (Map of String)
+- `ctx_size` (Number)
+- `embeddings` (Boolean)
+- `health_route` (String)
+- `n_parallel` (Number)
+- `port` (Number)
+- `threads_http` (Number)
+
+
+<a id="nestedatt--model--image--tei"></a>
+### Nested Schema for `model.image.tei`
+
+Required:
+
+- `url` (String)
+
+Optional:
+
+- `health_route` (String)
+- `max_batch_tokens` (Number)
+- `max_concurrent_requests` (Number)
+- `pooling` (String)
+- `port` (Number)
+
+
+<a id="nestedatt--model--image--tgi"></a>
+### Nested Schema for `model.image.tgi`
+
+Required:
+
+- `url` (String)
+
+Optional:
+
+- `diable_custom_kernels` (Boolean)
+- `health_route` (String)
+- `max_batch_prefill_tokens` (Number)
+- `max_batch_total_tokens` (Number)
+- `max_input_length` (Number)
+- `max_total_tokens` (Number)
+- `port` (Number)
+- `quantize` (String)
+
+
+<a id="nestedatt--model--image--tgi_neuron"></a>
+### Nested Schema for `model.image.tgi_neuron`
+
+Required:
+
+- `url` (String)
+
+Optional:
+
+- `health_route` (String)
+- `hf_auto_cast_type` (String)
+- `hf_num_cores` (Number)
+- `max_batch_prefill_tokens` (Number)
+- `max_batch_total_tokens` (Number)
+- `max_input_length` (Number)
+- `max_total_tokens` (Number)
+- `port` (Number)
+
+
+<a id="nestedatt--model--image--tgi_tpu"></a>
+### Nested Schema for `model.image.tgi_tpu`
+
+Required:
+
+- `url` (String)
+
+Optional:
+
+- `diable_custom_kernels` (Boolean)
+- `health_route` (String)
+- `max_batch_prefill_tokens` (Number)
+- `max_batch_total_tokens` (Number)
+- `max_input_length` (Number)
+- `max_total_tokens` (Number)
+- `port` (Number)
+- `quantize` (String)
