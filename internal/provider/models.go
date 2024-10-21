@@ -46,46 +46,46 @@ type Image struct {
 }
 
 type Tei struct {
-	HealthRoute           *string     `json:"health_route,omitempty"`
-	Port                  types.Int64 `json:"port,omitempty"`
-	URL                   string      `json:"url"`
-	MaxBatchTokens        *int        `json:"maxBatchTokens,omitempty"`
-	MaxConcurrentRequests *int        `json:"maxConcurrentRequests,omitempty"`
-	Pooling               *string     `json:"pooling,omitempty"`
+	HealthRoute           *string     `tfsdk:"health_route"`
+	Port                  types.Int64 `tfsdk:"port"`
+	URL                   string      `tfsdk:"url"`
+	MaxBatchTokens        *int        `tfsdk:"max_batch_tokens"`
+	MaxConcurrentRequests *int        `tfsdk:"max_concurrent_requests"`
+	Pooling               *string     `tfsdk:"pooling"`
 }
 
 type Llamacpp struct {
 	HealthRoute *string     `tfsdk:"health_route"`
 	Port        types.Int64 `tfsdk:"port"`
 	URL         string      `tfsdk:"url"`
-	CtxSize     *int        `tfsdk:"ctxSize"`
+	CtxSize     *int        `tfsdk:"ctx_size"`
 	Embeddings  *bool       `tfsdk:"embeddings"`
 	ModelPath   string      `tfsdk:"modelPath"`
-	NParallel   *int        `tfsdk:"nParallel"`
-	ThreadsHttp *int        `tfsdk:"threadsHttp"`
+	NParallel   *int        `tfsdk:"n_parallel"`
+	ThreadsHttp *int        `tfsdk:"threads_http"`
 }
 
 type TgiNeuron struct {
 	HealthRoute           *string     `tfsdk:"health_route"`
 	Port                  types.Int64 `tfsdk:"port"`
 	URL                   string      `tfsdk:"url"`
-	MaxBatchPrefillTokens *int        `tfsdk:"maxBatchPrefillTokens"`
-	MaxBatchTotalTokens   *int        `tfsdk:"maxBatchTotalTokens"`
-	MaxInputLength        *int        `tfsdk:"maxInputLength"`
-	MaxTotalTokens        *int        `tfsdk:"maxTotalTokens"`
-	HfAutoCastType        *string     `tfsdk:"hfAutoCastType"`
-	HfNumCores            *int        `tfsdk:"hfNumCores"`
+	MaxBatchPrefillTokens *int        `tfsdk:"max_batch_prefill_tokens"`
+	MaxBatchTotalTokens   *int        `tfsdk:"max_batch_total_tokens"`
+	MaxInputLength        *int        `tfsdk:"max_input_length"`
+	MaxTotalTokens        *int        `tfsdk:"max_total_tokens"`
+	HfAutoCastType        *string     `tfsdk:"hf_auto_cast_type"`
+	HfNumCores            *int        `tfsdk:"hf_num_cores"`
 }
 
 type TgiTpu struct {
 	HealthRoute           *string     `tfsdk:"health_route"`
 	Port                  types.Int64 `tfsdk:"port"`
 	URL                   string      `tfsdk:"url"`
-	MaxBatchPrefillTokens *int        `tfsdk:"maxBatchPrefillTokens"`
-	MaxBatchTotalTokens   *int        `tfsdk:"maxBatchTotalTokens"`
-	MaxInputLength        *int        `tfsdk:"maxInputLength"`
-	MaxTotalTokens        *int        `tfsdk:"maxTotalTokens"`
-	DisableCustomKernels  *bool       `tfsdk:"disableCustomKernels"`
+	MaxBatchPrefillTokens *int        `tfsdk:"max_batch_prefill_tokens"`
+	MaxBatchTotalTokens   *int        `tfsdk:"max_batch_total_tokens"`
+	MaxInputLength        *int        `tfsdk:"max_input_length"`
+	MaxTotalTokens        *int        `tfsdk:"max_total_tokens"`
+	DisableCustomKernels  *bool       `tfsdk:"disable_custom_kernels"`
 	Quantize              *string     `tfsdk:"quantize"`
 }
 
@@ -93,11 +93,11 @@ type Tgi struct {
 	HealthRoute           *string     `tfsdk:"health_route"`
 	Port                  types.Int64 `tfsdk:"port"`
 	URL                   string      `tfsdk:"url"`
-	MaxBatchPrefillTokens *int        `tfsdk:"maxBatchPrefillTokens"`
-	MaxBatchTotalTokens   *int        `tfsdk:"maxBatchTotalTokens"`
-	MaxInputLength        *int        `tfsdk:"maxInputLength"`
-	MaxTotalTokens        *int        `tfsdk:"maxTotalTokens"`
-	DisableCustomKernels  *bool       `tfsdk:"disableCustomKernels"`
+	MaxBatchPrefillTokens *int        `tfsdk:"max_batch_prefill_tokens"`
+	MaxBatchTotalTokens   *int        `tfsdk:"max_batch_total_tokens"`
+	MaxInputLength        *int        `tfsdk:"max_input_length"`
+	MaxTotalTokens        *int        `tfsdk:"max_total_tokens"`
+	DisableCustomKernels  *bool       `tfsdk:"disable_custom_kernels"`
 	Quantize              *string     `tfsdk:"quantize"`
 }
 

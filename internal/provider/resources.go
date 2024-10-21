@@ -135,6 +135,159 @@ func (r *endpointResource) Schema(_ context.Context, _ resource.SchemaRequest, r
 									},
 								},
 							},
+							"tei": schema.SingleNestedAttribute{
+								Optional: true,
+								Attributes: map[string]schema.Attribute{
+									"health_route": schema.StringAttribute{
+										Optional: true,
+									},
+									"port": schema.Int64Attribute{
+										Optional: true,
+										Computed: true,
+									},
+									"url": schema.StringAttribute{
+										Required: true,
+									},
+									"max_batch_tokens": schema.Int64Attribute{
+										Optional: true,
+									},
+									"max_concurrent_requests": schema.Int64Attribute{
+										Optional: true,
+									},
+									"pooling": schema.StringAttribute{
+										Optional: true,
+									},
+								},
+							},
+							"tgi": schema.SingleNestedAttribute{
+								Optional: true,
+								Attributes: map[string]schema.Attribute{
+									"health_route": schema.StringAttribute{
+										Optional: true,
+									},
+									"port": schema.Int64Attribute{
+										Optional: true,
+										Computed: true,
+									},
+									"url": schema.StringAttribute{
+										Required: true,
+									},
+									"max_batch_prefill_tokens": schema.Int64Attribute{
+										Optional: true,
+									},
+									"max_batch_total_tokens": schema.Int64Attribute{
+										Optional: true,
+									},
+									"max_input_length": schema.Int64Attribute{
+										Optional: true,
+									},
+									"max_total_tokens": schema.Int64Attribute{
+										Optional: true,
+									},
+									"diable_custom_kernels": schema.BoolAttribute{
+										Optional: true,
+									},
+									"quantize": schema.StringAttribute{
+										Optional: true,
+									},
+								},
+							},
+							"tgi_tpu": schema.SingleNestedAttribute{
+								Optional: true,
+								Attributes: map[string]schema.Attribute{
+									"health_route": schema.StringAttribute{
+										Optional: true,
+									},
+									"port": schema.Int64Attribute{
+										Optional: true,
+										Computed: true,
+									},
+									"url": schema.StringAttribute{
+										Required: true,
+									},
+									"max_batch_prefill_tokens": schema.Int64Attribute{
+										Optional: true,
+									},
+									"max_batch_total_tokens": schema.Int64Attribute{
+										Optional: true,
+									},
+									"max_input_length": schema.Int64Attribute{
+										Optional: true,
+									},
+									"max_total_tokens": schema.Int64Attribute{
+										Optional: true,
+									},
+									"diable_custom_kernels": schema.BoolAttribute{
+										Optional: true,
+									},
+									"quantize": schema.StringAttribute{
+										Optional: true,
+									},
+								},
+							},
+							"tgi_neuron": schema.SingleNestedAttribute{
+								Optional: true,
+								Attributes: map[string]schema.Attribute{
+									"health_route": schema.StringAttribute{
+										Optional: true,
+									},
+									"port": schema.Int64Attribute{
+										Optional: true,
+										Computed: true,
+									},
+									"url": schema.StringAttribute{
+										Required: true,
+									},
+									"max_batch_prefill_tokens": schema.Int64Attribute{
+										Optional: true,
+									},
+									"max_batch_total_tokens": schema.Int64Attribute{
+										Optional: true,
+									},
+									"max_input_length": schema.Int64Attribute{
+										Optional: true,
+									},
+									"max_total_tokens": schema.Int64Attribute{
+										Optional: true,
+									},
+									"hf_auto_cast_type": schema.StringAttribute{
+										Optional: true,
+									},
+									"hf_num_cores": schema.Int64Attribute{
+										Optional: true,
+									},
+								},
+							},
+							"llamacpp": schema.SingleNestedAttribute{
+								Optional: true,
+								Attributes: map[string]schema.Attribute{
+									"health_route": schema.StringAttribute{
+										Optional: true,
+									},
+									"port": schema.Int64Attribute{
+										Optional: true,
+										Computed: true,
+									},
+									"url": schema.StringAttribute{
+										Required: true,
+									},
+									"ctx_size": schema.Int64Attribute{
+										Optional: true,
+									},
+									"embeddings": schema.BoolAttribute{
+										Optional: true,
+									},
+									"model_path": schema.StringAttribute{
+										Required: true,
+									},
+									"n_parallel": schema.Int64Attribute{
+										Optional: true,
+									},
+									"threads_http": schema.Int64Attribute{
+										Optional: true,
+									},
+								},
+							},
 						},
 					},
 					"repository": schema.StringAttribute{
