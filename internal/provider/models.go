@@ -38,6 +38,67 @@ type Model struct {
 type Image struct {
 	Huggingface *Huggingface `tfsdk:"huggingface"`
 	Custom      *Custom      `tfsdk:"custom"`
+	Tei         *Tei         `tfsdk:"tei"`
+	Tgi         *Tgi         `tfsdk:"tgi"`
+	TgiTpu      *TgiTpu      `tfsdk:"tgiTpu"`
+	TgiNeuron   *TgiNeuron   `tfsdk:"tgiNeuron"`
+	Llamacpp    *Llamacpp    `tfsdk:"llamacpp"`
+}
+
+type Tei struct {
+	HealthRoute           *string     `json:"health_route,omitempty"`
+	Port                  types.Int64 `json:"port,omitempty"`
+	URL                   string      `json:"url"`
+	MaxBatchTokens        *int        `json:"maxBatchTokens,omitempty"`
+	MaxConcurrentRequests *int        `json:"maxConcurrentRequests,omitempty"`
+	Pooling               *string     `json:"pooling,omitempty"`
+}
+
+type Llamacpp struct {
+	HealthRoute *string     `tfsdk:"health_route"`
+	Port        types.Int64 `tfsdk:"port"`
+	URL         string      `tfsdk:"url"`
+	CtxSize     *int        `tfsdk:"ctxSize"`
+	Embeddings  *bool       `tfsdk:"embeddings"`
+	ModelPath   string      `tfsdk:"modelPath"`
+	NParallel   *int        `tfsdk:"nParallel"`
+	ThreadsHttp *int        `tfsdk:"threadsHttp"`
+}
+
+type TgiNeuron struct {
+	HealthRoute           *string     `tfsdk:"health_route"`
+	Port                  types.Int64 `tfsdk:"port"`
+	URL                   string      `tfsdk:"url"`
+	MaxBatchPrefillTokens *int        `tfsdk:"maxBatchPrefillTokens"`
+	MaxBatchTotalTokens   *int        `tfsdk:"maxBatchTotalTokens"`
+	MaxInputLength        *int        `tfsdk:"maxInputLength"`
+	MaxTotalTokens        *int        `tfsdk:"maxTotalTokens"`
+	HfAutoCastType        *string     `tfsdk:"hfAutoCastType"`
+	HfNumCores            *int        `tfsdk:"hfNumCores"`
+}
+
+type TgiTpu struct {
+	HealthRoute           *string     `tfsdk:"health_route"`
+	Port                  types.Int64 `tfsdk:"port"`
+	URL                   string      `tfsdk:"url"`
+	MaxBatchPrefillTokens *int        `tfsdk:"maxBatchPrefillTokens"`
+	MaxBatchTotalTokens   *int        `tfsdk:"maxBatchTotalTokens"`
+	MaxInputLength        *int        `tfsdk:"maxInputLength"`
+	MaxTotalTokens        *int        `tfsdk:"maxTotalTokens"`
+	DisableCustomKernels  *bool       `tfsdk:"disableCustomKernels"`
+	Quantize              *string     `tfsdk:"quantize"`
+}
+
+type Tgi struct {
+	HealthRoute           *string     `tfsdk:"health_route"`
+	Port                  types.Int64 `tfsdk:"port"`
+	URL                   string      `tfsdk:"url"`
+	MaxBatchPrefillTokens *int        `tfsdk:"maxBatchPrefillTokens"`
+	MaxBatchTotalTokens   *int        `tfsdk:"maxBatchTotalTokens"`
+	MaxInputLength        *int        `tfsdk:"maxInputLength"`
+	MaxTotalTokens        *int        `tfsdk:"maxTotalTokens"`
+	DisableCustomKernels  *bool       `tfsdk:"disableCustomKernels"`
+	Quantize              *string     `tfsdk:"quantize"`
 }
 
 type Custom struct {
@@ -49,8 +110,8 @@ type Custom struct {
 }
 
 type Credentials struct {
-	Password string `json:"password"`
-	Username string `json:"username"`
+	Password string `tfsdk:"password"`
+	Username string `tfsdk:"username"`
 }
 
 type Huggingface struct {

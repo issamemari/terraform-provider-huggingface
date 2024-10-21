@@ -201,6 +201,91 @@ func clientEndpointToProviderEndpoint(endpoint huggingface.EndpointDetails) endp
 				Password: endpoint.Model.Image.Custom.Credentials.Password,
 			}
 		}
+	} else if endpoint.Model.Image.Tgi != nil {
+		var port64 *int64
+		port := endpoint.Model.Image.Tgi.Port
+		if port == nil {
+			port64 = nil
+		} else {
+			portInt64 := int64(*port)
+			port64 = &portInt64
+		}
+		image = Image{
+			Tgi: &Tgi{
+				HealthRoute:           endpoint.Model.Image.Tgi.HealthRoute,
+				Port:                  types.Int64PointerValue(port64),
+				URL:                   endpoint.Model.Image.Tgi.URL,
+				MaxBatchPrefillTokens: endpoint.Model.Image.Tgi.MaxBatchPrefillTokens,
+				MaxBatchTotalTokens:   endpoint.Model.Image.Tgi.MaxBatchTotalTokens,
+				MaxInputLength:        endpoint.Model.Image.Tgi.MaxInputLength,
+				MaxTotalTokens:        endpoint.Model.Image.Tgi.MaxTotalTokens,
+				DisableCustomKernels:  endpoint.Model.Image.Tgi.DisableCustomKernels,
+				Quantize:              endpoint.Model.Image.Tgi.Quantize,
+			},
+		}
+	} else if endpoint.Model.Image.TgiNeuron != nil {
+		var port64 *int64
+		port := endpoint.Model.Image.TgiNeuron.Port
+		if port == nil {
+			port64 = nil
+		} else {
+			portInt64 := int64(*port)
+			port64 = &portInt64
+		}
+		image = Image{
+			TgiNeuron: &TgiNeuron{
+				HealthRoute:           endpoint.Model.Image.TgiNeuron.HealthRoute,
+				Port:                  types.Int64PointerValue(port64),
+				URL:                   endpoint.Model.Image.TgiNeuron.URL,
+				MaxBatchPrefillTokens: endpoint.Model.Image.TgiNeuron.MaxBatchPrefillTokens,
+				MaxBatchTotalTokens:   endpoint.Model.Image.TgiNeuron.MaxBatchTotalTokens,
+				MaxInputLength:        endpoint.Model.Image.TgiNeuron.MaxInputLength,
+				MaxTotalTokens:        endpoint.Model.Image.TgiNeuron.MaxTotalTokens,
+				HfAutoCastType:        endpoint.Model.Image.TgiNeuron.HfAutoCastType,
+				HfNumCores:            endpoint.Model.Image.TgiNeuron.HfNumCores,
+			},
+		}
+	} else if endpoint.Model.Image.TgiTpu != nil {
+		var port64 *int64
+		port := endpoint.Model.Image.TgiTpu.Port
+		if port == nil {
+			port64 = nil
+		} else {
+			portInt64 := int64(*port)
+			port64 = &portInt64
+		}
+		image = Image{
+			TgiTpu: &TgiTpu{
+				HealthRoute:           endpoint.Model.Image.TgiTpu.HealthRoute,
+				Port:                  types.Int64PointerValue(port64),
+				URL:                   endpoint.Model.Image.TgiTpu.URL,
+				MaxBatchPrefillTokens: endpoint.Model.Image.TgiTpu.MaxBatchPrefillTokens,
+				MaxBatchTotalTokens:   endpoint.Model.Image.TgiTpu.MaxBatchTotalTokens,
+				MaxInputLength:        endpoint.Model.Image.TgiTpu.MaxInputLength,
+				MaxTotalTokens:        endpoint.Model.Image.TgiTpu.MaxTotalTokens,
+				DisableCustomKernels:  endpoint.Model.Image.TgiTpu.DisableCustomKernels,
+				Quantize:              endpoint.Model.Image.TgiTpu.Quantize,
+			},
+		}
+	} else if endpoint.Model.Image.Tei != nil {
+		var port64 *int64
+		port := endpoint.Model.Image.Tei.Port
+		if port == nil {
+			port64 = nil
+		} else {
+			portInt64 := int64(*port)
+			port64 = &portInt64
+		}
+		image = Image{
+			Tei: &Tei{
+				HealthRoute:           endpoint.Model.Image.Tei.HealthRoute,
+				Port:                  types.Int64PointerValue(port64),
+				URL:                   endpoint.Model.Image.Tei.URL,
+				MaxBatchTokens:        endpoint.Model.Image.Tei.MaxBatchTokens,
+				MaxConcurrentRequests: endpoint.Model.Image.Tei.MaxConcurrentRequests,
+				Pooling:               endpoint.Model.Image.Tei.Pooling,
+			},
+		}
 	}
 
 	var timeout64 *int64
@@ -280,6 +365,87 @@ func providerEndpointToCreateEndpointRequest(endpoint endpointResourceModel) hug
 				Password: endpoint.Model.Image.Custom.Credentials.Password,
 			}
 		}
+	} else if endpoint.Model.Image.Tgi != nil {
+		var port *int
+		if endpoint.Model.Image.Tgi.Port.IsUnknown() || endpoint.Model.Image.Tgi.Port.IsNull() {
+			port = nil
+		} else {
+			portInt := int(endpoint.Model.Image.Tgi.Port.ValueInt64())
+			port = &portInt
+		}
+		image = huggingface.Image{
+			Tgi: &huggingface.Tgi{
+				HealthRoute:           endpoint.Model.Image.Tgi.HealthRoute,
+				Port:                  port,
+				URL:                   endpoint.Model.Image.Tgi.URL,
+				MaxBatchPrefillTokens: endpoint.Model.Image.Tgi.MaxBatchPrefillTokens,
+				MaxBatchTotalTokens:   endpoint.Model.Image.Tgi.MaxBatchTotalTokens,
+				MaxInputLength:        endpoint.Model.Image.Tgi.MaxInputLength,
+				MaxTotalTokens:        endpoint.Model.Image.Tgi.MaxTotalTokens,
+				DisableCustomKernels:  endpoint.Model.Image.Tgi.DisableCustomKernels,
+				Quantize:              endpoint.Model.Image.Tgi.Quantize,
+			},
+		}
+	} else if endpoint.Model.Image.TgiNeuron != nil {
+		var port *int
+		if endpoint.Model.Image.TgiNeuron.Port.IsUnknown() || endpoint.Model.Image.TgiNeuron.Port.IsNull() {
+			port = nil
+		} else {
+			portInt := int(endpoint.Model.Image.TgiNeuron.Port.ValueInt64())
+			port = &portInt
+		}
+		image = huggingface.Image{
+			TgiNeuron: &huggingface.TgiNeuron{
+				HealthRoute:           endpoint.Model.Image.TgiNeuron.HealthRoute,
+				Port:                  port,
+				URL:                   endpoint.Model.Image.TgiNeuron.URL,
+				MaxBatchPrefillTokens: endpoint.Model.Image.TgiNeuron.MaxBatchPrefillTokens,
+				MaxBatchTotalTokens:   endpoint.Model.Image.TgiNeuron.MaxBatchTotalTokens,
+				MaxInputLength:        endpoint.Model.Image.TgiNeuron.MaxInputLength,
+				MaxTotalTokens:        endpoint.Model.Image.TgiNeuron.MaxTotalTokens,
+				HfAutoCastType:        endpoint.Model.Image.TgiNeuron.HfAutoCastType,
+				HfNumCores:            endpoint.Model.Image.TgiNeuron.HfNumCores,
+			},
+		}
+	} else if endpoint.Model.Image.TgiTpu != nil {
+		var port *int
+		if endpoint.Model.Image.TgiTpu.Port.IsUnknown() || endpoint.Model.Image.TgiTpu.Port.IsNull() {
+			port = nil
+		} else {
+			portInt := int(endpoint.Model.Image.TgiTpu.Port.ValueInt64())
+			port = &portInt
+		}
+		image = huggingface.Image{
+			TgiTpu: &huggingface.TgiTpu{
+				HealthRoute:           endpoint.Model.Image.TgiTpu.HealthRoute,
+				Port:                  port,
+				URL:                   endpoint.Model.Image.TgiTpu.URL,
+				MaxBatchPrefillTokens: endpoint.Model.Image.TgiTpu.MaxBatchPrefillTokens,
+				MaxBatchTotalTokens:   endpoint.Model.Image.TgiTpu.MaxBatchTotalTokens,
+				MaxInputLength:        endpoint.Model.Image.TgiTpu.MaxInputLength,
+				MaxTotalTokens:        endpoint.Model.Image.TgiTpu.MaxTotalTokens,
+				DisableCustomKernels:  endpoint.Model.Image.TgiTpu.DisableCustomKernels,
+				Quantize:              endpoint.Model.Image.TgiTpu.Quantize,
+			},
+		}
+	} else if endpoint.Model.Image.Tei != nil {
+		var port *int
+		if endpoint.Model.Image.Tei.Port.IsUnknown() || endpoint.Model.Image.Tei.Port.IsNull() {
+			port = nil
+		} else {
+			portInt := int(endpoint.Model.Image.Tei.Port.ValueInt64())
+			port = &portInt
+		}
+		image = huggingface.Image{
+			Tei: &huggingface.Tei{
+				HealthRoute:           endpoint.Model.Image.Tei.HealthRoute,
+				Port:                  port,
+				URL:                   endpoint.Model.Image.Tei.URL,
+				MaxBatchTokens:        endpoint.Model.Image.Tei.MaxBatchTokens,
+				MaxConcurrentRequests: endpoint.Model.Image.Tei.MaxConcurrentRequests,
+				Pooling:               endpoint.Model.Image.Tei.Pooling,
+			},
+		}
 	}
 
 	var timeout *int
@@ -349,6 +515,87 @@ func providerEndpointToUpdateEndpointRequest(endpoint endpointResourceModel) hug
 				Username: endpoint.Model.Image.Custom.Credentials.Username,
 				Password: endpoint.Model.Image.Custom.Credentials.Password,
 			}
+		}
+	} else if endpoint.Model.Image.Tgi != nil {
+		var port *int
+		if endpoint.Model.Image.Tgi.Port.IsUnknown() || endpoint.Model.Image.Tgi.Port.IsNull() {
+			port = nil
+		} else {
+			portInt := int(endpoint.Model.Image.Tgi.Port.ValueInt64())
+			port = &portInt
+		}
+		image = huggingface.Image{
+			Tgi: &huggingface.Tgi{
+				HealthRoute:           endpoint.Model.Image.Tgi.HealthRoute,
+				Port:                  port,
+				URL:                   endpoint.Model.Image.Tgi.URL,
+				MaxBatchPrefillTokens: endpoint.Model.Image.Tgi.MaxBatchPrefillTokens,
+				MaxBatchTotalTokens:   endpoint.Model.Image.Tgi.MaxBatchTotalTokens,
+				MaxInputLength:        endpoint.Model.Image.Tgi.MaxInputLength,
+				MaxTotalTokens:        endpoint.Model.Image.Tgi.MaxTotalTokens,
+				DisableCustomKernels:  endpoint.Model.Image.Tgi.DisableCustomKernels,
+				Quantize:              endpoint.Model.Image.Tgi.Quantize,
+			},
+		}
+	} else if endpoint.Model.Image.TgiNeuron != nil {
+		var port *int
+		if endpoint.Model.Image.TgiNeuron.Port.IsUnknown() || endpoint.Model.Image.TgiNeuron.Port.IsNull() {
+			port = nil
+		} else {
+			portInt := int(endpoint.Model.Image.TgiNeuron.Port.ValueInt64())
+			port = &portInt
+		}
+		image = huggingface.Image{
+			TgiNeuron: &huggingface.TgiNeuron{
+				HealthRoute:           endpoint.Model.Image.TgiNeuron.HealthRoute,
+				Port:                  port,
+				URL:                   endpoint.Model.Image.TgiNeuron.URL,
+				MaxBatchPrefillTokens: endpoint.Model.Image.TgiNeuron.MaxBatchPrefillTokens,
+				MaxBatchTotalTokens:   endpoint.Model.Image.TgiNeuron.MaxBatchTotalTokens,
+				MaxInputLength:        endpoint.Model.Image.TgiNeuron.MaxInputLength,
+				MaxTotalTokens:        endpoint.Model.Image.TgiNeuron.MaxTotalTokens,
+				HfAutoCastType:        endpoint.Model.Image.TgiNeuron.HfAutoCastType,
+				HfNumCores:            endpoint.Model.Image.TgiNeuron.HfNumCores,
+			},
+		}
+	} else if endpoint.Model.Image.TgiTpu != nil {
+		var port *int
+		if endpoint.Model.Image.TgiTpu.Port.IsUnknown() || endpoint.Model.Image.TgiTpu.Port.IsNull() {
+			port = nil
+		} else {
+			portInt := int(endpoint.Model.Image.TgiTpu.Port.ValueInt64())
+			port = &portInt
+		}
+		image = huggingface.Image{
+			TgiTpu: &huggingface.TgiTpu{
+				HealthRoute:           endpoint.Model.Image.TgiTpu.HealthRoute,
+				Port:                  port,
+				URL:                   endpoint.Model.Image.TgiTpu.URL,
+				MaxBatchPrefillTokens: endpoint.Model.Image.TgiTpu.MaxBatchPrefillTokens,
+				MaxBatchTotalTokens:   endpoint.Model.Image.TgiTpu.MaxBatchTotalTokens,
+				MaxInputLength:        endpoint.Model.Image.TgiTpu.MaxInputLength,
+				MaxTotalTokens:        endpoint.Model.Image.TgiTpu.MaxTotalTokens,
+				DisableCustomKernels:  endpoint.Model.Image.TgiTpu.DisableCustomKernels,
+				Quantize:              endpoint.Model.Image.TgiTpu.Quantize,
+			},
+		}
+	} else if endpoint.Model.Image.Tei != nil {
+		var port *int
+		if endpoint.Model.Image.Tei.Port.IsUnknown() || endpoint.Model.Image.Tei.Port.IsNull() {
+			port = nil
+		} else {
+			portInt := int(endpoint.Model.Image.Tei.Port.ValueInt64())
+			port = &portInt
+		}
+		image = huggingface.Image{
+			Tei: &huggingface.Tei{
+				HealthRoute:           endpoint.Model.Image.Tei.HealthRoute,
+				Port:                  port,
+				URL:                   endpoint.Model.Image.Tei.URL,
+				MaxBatchTokens:        endpoint.Model.Image.Tei.MaxBatchTokens,
+				MaxConcurrentRequests: endpoint.Model.Image.Tei.MaxConcurrentRequests,
+				Pooling:               endpoint.Model.Image.Tei.Pooling,
+			},
 		}
 	}
 
