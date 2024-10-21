@@ -40,8 +40,8 @@ type Image struct {
 	Custom      *Custom      `tfsdk:"custom"`
 	Tei         *Tei         `tfsdk:"tei"`
 	Tgi         *Tgi         `tfsdk:"tgi"`
-	TgiTpu      *TgiTpu      `tfsdk:"tgiTpu"`
-	TgiNeuron   *TgiNeuron   `tfsdk:"tgiNeuron"`
+	TgiTpu      *TgiTpu      `tfsdk:"tgi_tpu"`
+	TgiNeuron   *TgiNeuron   `tfsdk:"tgi_neuron"`
 	Llamacpp    *Llamacpp    `tfsdk:"llamacpp"`
 }
 
