@@ -21,10 +21,16 @@ type Compute struct {
 	Scaling      Scaling `tfsdk:"scaling"`
 }
 
+type Measure struct {
+	HardwareUsage   *float64 `tfsdk:"hardware_usage"`
+	PendingRequests *float64 `tfsdk:"pending_requests"`
+}
+
 type Scaling struct {
 	MaxReplica         int         `tfsdk:"max_replica"`
 	MinReplica         int         `tfsdk:"min_replica"`
 	ScaleToZeroTimeout types.Int64 `tfsdk:"scale_to_zero_timeout"`
+	Measure            *Measure    `tfsdk:"measure"`
 }
 
 type Model struct {

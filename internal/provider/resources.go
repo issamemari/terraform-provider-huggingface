@@ -83,6 +83,17 @@ func (r *endpointResource) Schema(_ context.Context, _ resource.SchemaRequest, r
 								Optional: true,
 								Computed: true,
 							},
+							"measure": schema.SingleNestedAttribute{
+								Optional: true,
+								Attributes: map[string]schema.Attribute{
+									"hardware_usage": schema.Float64Attribute{
+										Optional: true,
+									},
+									"pending_requests": schema.Float64Attribute{
+										Optional: true,
+									},
+								},
+							},
 						},
 					},
 				},
@@ -441,6 +452,14 @@ func clientEndpointToProviderEndpoint(endpoint huggingface.EndpointDetails) endp
 		timeout64 = &timeoutInt
 	}
 
+	var measure *Measure = nil
+	if endpoint.Compute.Scaling.Measure != nil {
+		measure = &Measure{
+			HardwareUsage:   endpoint.Compute.Scaling.Measure.HardwareUsage,
+			PendingRequests: endpoint.Compute.Scaling.Measure.PendingRequests,
+		}
+	}
+
 	providerEndpoint := endpointResourceModel{
 		AccountId: types.StringPointerValue(endpoint.AccountId),
 		Compute: Compute{
@@ -451,6 +470,7 @@ func clientEndpointToProviderEndpoint(endpoint huggingface.EndpointDetails) endp
 				MaxReplica:         endpoint.Compute.Scaling.MaxReplica,
 				MinReplica:         endpoint.Compute.Scaling.MinReplica,
 				ScaleToZeroTimeout: types.Int64PointerValue(timeout64),
+				Measure:            measure,
 			},
 		},
 		Model: Model{
@@ -594,6 +614,14 @@ func providerEndpointToCreateEndpointRequest(endpoint endpointResourceModel) hug
 		timeout = &timeoutInt
 	}
 
+	var measure *huggingface.Measure = nil
+	if endpoint.Compute.Scaling.Measure != nil {
+		measure = &huggingface.Measure{
+			HardwareUsage:   endpoint.Compute.Scaling.Measure.HardwareUsage,
+			PendingRequests: endpoint.Compute.Scaling.Measure.PendingRequests,
+		}
+	}
+
 	huggingfaceEndpoint := huggingface.CreateEndpointRequest{
 		Name:      endpoint.Name.ValueString(),
 		AccountId: endpoint.AccountId.ValueStringPointer(),
@@ -605,6 +633,7 @@ func providerEndpointToCreateEndpointRequest(endpoint endpointResourceModel) hug
 				MaxReplica:         endpoint.Compute.Scaling.MaxReplica,
 				MinReplica:         endpoint.Compute.Scaling.MinReplica,
 				ScaleToZeroTimeout: timeout,
+				Measure:            measure,
 			},
 		},
 		Model: huggingface.Model{
@@ -742,6 +771,15 @@ func providerEndpointToUpdateEndpointRequest(endpoint endpointResourceModel) hug
 		timeoutInt := int(endpoint.Compute.Scaling.ScaleToZeroTimeout.ValueInt64())
 		timeout = &timeoutInt
 	}
+
+	var measure *huggingface.Measure = nil
+	if endpoint.Compute.Scaling.Measure != nil {
+		measure = &huggingface.Measure{
+			HardwareUsage:   endpoint.Compute.Scaling.Measure.HardwareUsage,
+			PendingRequests: endpoint.Compute.Scaling.Measure.PendingRequests,
+		}
+	}
+
 	huggingfaceEndpoint := huggingface.UpdateEndpointRequest{
 		Compute: &huggingface.Compute{
 			Accelerator:  endpoint.Compute.Accelerator,
@@ -751,6 +789,7 @@ func providerEndpointToUpdateEndpointRequest(endpoint endpointResourceModel) hug
 				MaxReplica:         endpoint.Compute.Scaling.MaxReplica,
 				MinReplica:         endpoint.Compute.Scaling.MinReplica,
 				ScaleToZeroTimeout: timeout,
+				Measure:            measure,
 			},
 		},
 		Model: &huggingface.Model{

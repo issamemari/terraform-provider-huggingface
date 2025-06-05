@@ -8,6 +8,9 @@ resource "huggingface_endpoint" "enhanced_search_embedding" {
     scaling = {
       min_replica = 0
       max_replica = 1
+      measure = {
+        hardware_usage = 1.23424
+      }
     }
   }
 
