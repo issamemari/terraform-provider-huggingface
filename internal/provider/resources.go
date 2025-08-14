@@ -197,39 +197,6 @@ func (r *endpointResource) Schema(_ context.Context, _ resource.SchemaRequest, r
 									},
 								},
 							},
-							"tgi_tpu": schema.SingleNestedAttribute{
-								Optional: true,
-								Attributes: map[string]schema.Attribute{
-									"health_route": schema.StringAttribute{
-										Optional: true,
-									},
-									"port": schema.Int64Attribute{
-										Optional: true,
-										Computed: true,
-									},
-									"url": schema.StringAttribute{
-										Required: true,
-									},
-									"max_batch_prefill_tokens": schema.Int64Attribute{
-										Optional: true,
-									},
-									"max_batch_total_tokens": schema.Int64Attribute{
-										Optional: true,
-									},
-									"max_input_length": schema.Int64Attribute{
-										Optional: true,
-									},
-									"max_total_tokens": schema.Int64Attribute{
-										Optional: true,
-									},
-									"diable_custom_kernels": schema.BoolAttribute{
-										Optional: true,
-									},
-									"quantize": schema.StringAttribute{
-										Optional: true,
-									},
-								},
-							},
 							"tgi_neuron": schema.SingleNestedAttribute{
 								Optional: true,
 								Attributes: map[string]schema.Attribute{
@@ -289,6 +256,33 @@ func (r *endpointResource) Schema(_ context.Context, _ resource.SchemaRequest, r
 										Optional: true,
 									},
 									"threads_http": schema.Int64Attribute{
+										Optional: true,
+									},
+								},
+							},
+							"vllm": schema.SingleNestedAttribute{
+								Optional: true,
+								Attributes: map[string]schema.Attribute{
+									"health_route": schema.StringAttribute{
+										Optional: true,
+									},
+									"port": schema.Int64Attribute{
+										Optional: true,
+										Computed: true,
+									},
+									"url": schema.StringAttribute{
+										Required: true,
+									},
+									"kv_cache_dtype": schema.StringAttribute{
+										Optional: true,
+									},
+									"max_num_batched_tokens": schema.Int64Attribute{
+										Optional: true,
+									},
+									"max_num_seqs": schema.Int64Attribute{
+										Optional: true,
+									},
+									"tensor_parallel_size": schema.Int64Attribute{
 										Optional: true,
 									},
 								},
@@ -400,28 +394,6 @@ func clientEndpointToProviderEndpoint(endpoint huggingface.EndpointDetails) endp
 				HfNumCores:            endpoint.Model.Image.TgiNeuron.HfNumCores,
 			},
 		}
-	} else if endpoint.Model.Image.TgiTpu != nil {
-		var port64 *int64
-		port := endpoint.Model.Image.TgiTpu.Port
-		if port == nil {
-			port64 = nil
-		} else {
-			portInt64 := int64(*port)
-			port64 = &portInt64
-		}
-		image = Image{
-			TgiTpu: &TgiTpu{
-				HealthRoute:           endpoint.Model.Image.TgiTpu.HealthRoute,
-				Port:                  types.Int64PointerValue(port64),
-				URL:                   endpoint.Model.Image.TgiTpu.URL,
-				MaxBatchPrefillTokens: endpoint.Model.Image.TgiTpu.MaxBatchPrefillTokens,
-				MaxBatchTotalTokens:   endpoint.Model.Image.TgiTpu.MaxBatchTotalTokens,
-				MaxInputLength:        endpoint.Model.Image.TgiTpu.MaxInputLength,
-				MaxTotalTokens:        endpoint.Model.Image.TgiTpu.MaxTotalTokens,
-				DisableCustomKernels:  endpoint.Model.Image.TgiTpu.DisableCustomKernels,
-				Quantize:              endpoint.Model.Image.TgiTpu.Quantize,
-			},
-		}
 	} else if endpoint.Model.Image.Tei != nil {
 		var port64 *int64
 		port := endpoint.Model.Image.Tei.Port
@@ -439,6 +411,26 @@ func clientEndpointToProviderEndpoint(endpoint huggingface.EndpointDetails) endp
 				MaxBatchTokens:        endpoint.Model.Image.Tei.MaxBatchTokens,
 				MaxConcurrentRequests: endpoint.Model.Image.Tei.MaxConcurrentRequests,
 				Pooling:               endpoint.Model.Image.Tei.Pooling,
+			},
+		}
+	} else if endpoint.Model.Image.Vllm != nil {
+		var port64 *int64
+		port := endpoint.Model.Image.Vllm.Port
+		if port == nil {
+			port64 = nil
+		} else {
+			portInt64 := int64(*port)
+			port64 = &portInt64
+		}
+		image = Image{
+			Vllm: &Vllm{
+				HealthRoute:         endpoint.Model.Image.Vllm.HealthRoute,
+				Port:                types.Int64PointerValue(port64),
+				URL:                 endpoint.Model.Image.Vllm.URL,
+				KvCacheDtype:        endpoint.Model.Image.Vllm.KvCacheDtype,
+				MaxNumBatchedTokens: endpoint.Model.Image.Vllm.MaxNumBatchedTokens,
+				MaxNumSeqs:          endpoint.Model.Image.Vllm.MaxNumSeqs,
+				TensorParallelSize:  endpoint.Model.Image.Vllm.TensorParallelSize,
 			},
 		}
 	}
@@ -565,27 +557,6 @@ func providerEndpointToCreateEndpointRequest(endpoint endpointResourceModel) hug
 				HfNumCores:            endpoint.Model.Image.TgiNeuron.HfNumCores,
 			},
 		}
-	} else if endpoint.Model.Image.TgiTpu != nil {
-		var port *int
-		if endpoint.Model.Image.TgiTpu.Port.IsUnknown() || endpoint.Model.Image.TgiTpu.Port.IsNull() {
-			port = nil
-		} else {
-			portInt := int(endpoint.Model.Image.TgiTpu.Port.ValueInt64())
-			port = &portInt
-		}
-		image = huggingface.Image{
-			TgiTpu: &huggingface.TgiTpu{
-				HealthRoute:           endpoint.Model.Image.TgiTpu.HealthRoute,
-				Port:                  port,
-				URL:                   endpoint.Model.Image.TgiTpu.URL,
-				MaxBatchPrefillTokens: endpoint.Model.Image.TgiTpu.MaxBatchPrefillTokens,
-				MaxBatchTotalTokens:   endpoint.Model.Image.TgiTpu.MaxBatchTotalTokens,
-				MaxInputLength:        endpoint.Model.Image.TgiTpu.MaxInputLength,
-				MaxTotalTokens:        endpoint.Model.Image.TgiTpu.MaxTotalTokens,
-				DisableCustomKernels:  endpoint.Model.Image.TgiTpu.DisableCustomKernels,
-				Quantize:              endpoint.Model.Image.TgiTpu.Quantize,
-			},
-		}
 	} else if endpoint.Model.Image.Tei != nil {
 		var port *int
 		if endpoint.Model.Image.Tei.Port.IsUnknown() || endpoint.Model.Image.Tei.Port.IsNull() {
@@ -602,6 +573,25 @@ func providerEndpointToCreateEndpointRequest(endpoint endpointResourceModel) hug
 				MaxBatchTokens:        endpoint.Model.Image.Tei.MaxBatchTokens,
 				MaxConcurrentRequests: endpoint.Model.Image.Tei.MaxConcurrentRequests,
 				Pooling:               endpoint.Model.Image.Tei.Pooling,
+			},
+		}
+	} else if endpoint.Model.Image.Vllm != nil {
+		var port *int
+		if endpoint.Model.Image.Vllm.Port.IsUnknown() || endpoint.Model.Image.Vllm.Port.IsNull() {
+			port = nil
+		} else {
+			portInt := int(endpoint.Model.Image.Vllm.Port.ValueInt64())
+			port = &portInt
+		}
+		image = huggingface.Image{
+			Vllm: &huggingface.Vllm{
+				HealthRoute:         endpoint.Model.Image.Vllm.HealthRoute,
+				Port:                port,
+				URL:                 endpoint.Model.Image.Vllm.URL,
+				KvCacheDtype:        endpoint.Model.Image.Vllm.KvCacheDtype,
+				MaxNumBatchedTokens: endpoint.Model.Image.Vllm.MaxNumBatchedTokens,
+				MaxNumSeqs:          endpoint.Model.Image.Vllm.MaxNumSeqs,
+				TensorParallelSize:  endpoint.Model.Image.Vllm.TensorParallelSize,
 			},
 		}
 	}
@@ -723,27 +713,6 @@ func providerEndpointToUpdateEndpointRequest(endpoint endpointResourceModel) hug
 				HfNumCores:            endpoint.Model.Image.TgiNeuron.HfNumCores,
 			},
 		}
-	} else if endpoint.Model.Image.TgiTpu != nil {
-		var port *int
-		if endpoint.Model.Image.TgiTpu.Port.IsUnknown() || endpoint.Model.Image.TgiTpu.Port.IsNull() {
-			port = nil
-		} else {
-			portInt := int(endpoint.Model.Image.TgiTpu.Port.ValueInt64())
-			port = &portInt
-		}
-		image = huggingface.Image{
-			TgiTpu: &huggingface.TgiTpu{
-				HealthRoute:           endpoint.Model.Image.TgiTpu.HealthRoute,
-				Port:                  port,
-				URL:                   endpoint.Model.Image.TgiTpu.URL,
-				MaxBatchPrefillTokens: endpoint.Model.Image.TgiTpu.MaxBatchPrefillTokens,
-				MaxBatchTotalTokens:   endpoint.Model.Image.TgiTpu.MaxBatchTotalTokens,
-				MaxInputLength:        endpoint.Model.Image.TgiTpu.MaxInputLength,
-				MaxTotalTokens:        endpoint.Model.Image.TgiTpu.MaxTotalTokens,
-				DisableCustomKernels:  endpoint.Model.Image.TgiTpu.DisableCustomKernels,
-				Quantize:              endpoint.Model.Image.TgiTpu.Quantize,
-			},
-		}
 	} else if endpoint.Model.Image.Tei != nil {
 		var port *int
 		if endpoint.Model.Image.Tei.Port.IsUnknown() || endpoint.Model.Image.Tei.Port.IsNull() {
@@ -760,6 +729,25 @@ func providerEndpointToUpdateEndpointRequest(endpoint endpointResourceModel) hug
 				MaxBatchTokens:        endpoint.Model.Image.Tei.MaxBatchTokens,
 				MaxConcurrentRequests: endpoint.Model.Image.Tei.MaxConcurrentRequests,
 				Pooling:               endpoint.Model.Image.Tei.Pooling,
+			},
+		}
+	} else if endpoint.Model.Image.Vllm != nil {
+		var port *int
+		if endpoint.Model.Image.Vllm.Port.IsUnknown() || endpoint.Model.Image.Vllm.Port.IsNull() {
+			port = nil
+		} else {
+			portInt := int(endpoint.Model.Image.Vllm.Port.ValueInt64())
+			port = &portInt
+		}
+		image = huggingface.Image{
+			Vllm: &huggingface.Vllm{
+				HealthRoute:         endpoint.Model.Image.Vllm.HealthRoute,
+				Port:                port,
+				URL:                 endpoint.Model.Image.Vllm.URL,
+				KvCacheDtype:        endpoint.Model.Image.Vllm.KvCacheDtype,
+				MaxNumBatchedTokens: endpoint.Model.Image.Vllm.MaxNumBatchedTokens,
+				MaxNumSeqs:          endpoint.Model.Image.Vllm.MaxNumSeqs,
+				TensorParallelSize:  endpoint.Model.Image.Vllm.TensorParallelSize,
 			},
 		}
 	}

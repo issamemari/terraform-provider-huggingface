@@ -47,9 +47,9 @@ type Image struct {
 	Custom      *Custom      `tfsdk:"custom"`
 	Tei         *Tei         `tfsdk:"tei"`
 	Tgi         *Tgi         `tfsdk:"tgi"`
-	TgiTpu      *TgiTpu      `tfsdk:"tgi_tpu"`
 	TgiNeuron   *TgiNeuron   `tfsdk:"tgi_neuron"`
 	Llamacpp    *Llamacpp    `tfsdk:"llamacpp"`
+	Vllm        *Vllm        `tfsdk:"vllm"`
 }
 
 type Tei struct {
@@ -84,17 +84,6 @@ type TgiNeuron struct {
 	HfNumCores            *int        `tfsdk:"hf_num_cores"`
 }
 
-type TgiTpu struct {
-	HealthRoute           *string     `tfsdk:"health_route"`
-	Port                  types.Int64 `tfsdk:"port"`
-	URL                   string      `tfsdk:"url"`
-	MaxBatchPrefillTokens *int        `tfsdk:"max_batch_prefill_tokens"`
-	MaxBatchTotalTokens   *int        `tfsdk:"max_batch_total_tokens"`
-	MaxInputLength        *int        `tfsdk:"max_input_length"`
-	MaxTotalTokens        *int        `tfsdk:"max_total_tokens"`
-	DisableCustomKernels  *bool       `tfsdk:"disable_custom_kernels"`
-	Quantize              *string     `tfsdk:"quantize"`
-}
 
 type Tgi struct {
 	HealthRoute           *string     `tfsdk:"health_route"`
@@ -148,4 +137,14 @@ type User struct {
 
 type Private struct {
 	ServiceName string `tfsdk:"service_name"`
+}
+
+type Vllm struct {
+	HealthRoute          *string     `tfsdk:"health_route"`
+	Port                 types.Int64 `tfsdk:"port"`
+	URL                  string      `tfsdk:"url"`
+	KvCacheDtype         *string     `tfsdk:"kv_cache_dtype"`
+	MaxNumBatchedTokens  *int        `tfsdk:"max_num_batched_tokens"`
+	MaxNumSeqs           *int        `tfsdk:"max_num_seqs"`
+	TensorParallelSize   *int        `tfsdk:"tensor_parallel_size"`
 }

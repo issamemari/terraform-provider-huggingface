@@ -1,15 +1,16 @@
-resource "huggingface_endpoint" "enhanced_search_embedding" {
-  name = "enh-srch-embed-staging-us-cpu"
+resource "huggingface_endpoint" "product_identification_reran_soy" {
+  name = "product-identification-reran-soy"
 
   compute = {
-    accelerator   = "cpu"
+    accelerator   = "gpu"
     instance_size = "x1"
-    instance_type = "intel-icl"
+    instance_type = "nvidia-l4"
     scaling = {
-      min_replica = 0
-      max_replica = 1
+      min_replica            = 0
+      max_replica            = 1
+      scale_to_zero_timeout  = 60
       measure = {
-        hardware_usage = 1.23424
+        hardware_usage = 80.0
       }
     }
   }
@@ -17,18 +18,17 @@ resource "huggingface_endpoint" "enhanced_search_embedding" {
   model = {
     framework = "pytorch"
     image = {
-      custom = {
-        url = "ghcr.io/huggingface/text-embeddings-inference:cpu-0.6.0"
+      vllm = {
+        port                 = 8000
+        url                  = "vllm/vllm-openai:gptoss"
+        tensor_parallel_size = 1
+        kv_cache_dtype      = "auto"
       }
     }
-    env = {
-      MAX_BATCH_TOKENS        = "1000000"
-      MAX_CONCURRENT_REQUESTS = "512"
-      MODEL_ID                = "/repository"
-    }
-    repository = "avsolatorio/GIST-Embedding-v0"
-    task       = "sentence-embeddings"
-    revision   = "025ccf7d0a8f03dbd7cead428899acfdf6636432"
+    env        = {}
+    repository = "sentence-transformers/stsb-roberta-base"
+    task       = "text-classification"
+    revision   = "main"
   }
 
   cloud = {
@@ -39,6 +39,6 @@ resource "huggingface_endpoint" "enhanced_search_embedding" {
   type = "protected"
 }
 
-output "enhanced_search_embedding" {
-  value = huggingface_endpoint.enhanced_search_embedding
+output "product_identification_reran_soy" {
+  value = huggingface_endpoint.product_identification_reran_soy
 }
