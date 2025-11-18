@@ -36,7 +36,7 @@ resource "huggingface_endpoint" "product_identification_reran_soy" {
     vendor = "aws"
   }
 
-  type = "protected"
+  type = "private"
 }
 
 output "product_identification_reran_soy" {
