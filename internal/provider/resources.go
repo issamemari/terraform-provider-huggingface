@@ -322,25 +322,68 @@ func (r *endpointResource) Schema(_ context.Context, _ resource.SchemaRequest, r
 	}
 }
 
-func clientEndpointToProviderEndpoint(endpoint huggingface.EndpointDetails) endpointResourceModel {
+func preserveExplicitEnvVars(apiEnv map[string]string, currentState *endpointResourceModel) map[string]string {
+	// If no current state, return API values or empty map
+	if currentState == nil {
+		if apiEnv == nil {
+			return make(map[string]string)
+		}
+		return apiEnv
+	}
+
+	// Start with empty map
+	result := make(map[string]string)
+	
+	// Add explicitly set values from current state
+	if currentState.Model.Env != nil {
+		for key, value := range currentState.Model.Env {
+			result[key] = value
+		}
+	}
+	
+	// Add any new values from API that weren't explicitly set
+	if apiEnv != nil {
+		for key, value := range apiEnv {
+			if _, exists := result[key]; !exists {
+				// This is a computed value from API, only add if it's not HF_TOKEN
+				// HF_TOKEN is commonly computed by the API but causes drift
+				if key != "HF_TOKEN" {
+					result[key] = value
+				}
+			}
+		}
+	}
+	
+	return result
+}
+
+func clientEndpointToProviderEndpoint(endpoint huggingface.EndpointDetails, currentState *endpointResourceModel) endpointResourceModel {
 	var image Image
 	if endpoint.Model.Image.Huggingface != nil {
 		image = Image{
 			Huggingface: &Huggingface{},
 		}
 	} else if endpoint.Model.Image.Custom != nil {
-		var port64 *int64
-		port := endpoint.Model.Image.Custom.Port
-		if port == nil {
-			port64 = nil
+		var portValue types.Int64
+		if currentState != nil && currentState.Model.Image.Custom != nil && !currentState.Model.Image.Custom.Port.IsNull() && !currentState.Model.Image.Custom.Port.IsUnknown() {
+			// Preserve the explicitly set value from current state
+			portValue = currentState.Model.Image.Custom.Port
 		} else {
-			portInt64 := int64(*port)
-			port64 = &portInt64
+			// Use the computed value from API response
+			var port64 *int64
+			port := endpoint.Model.Image.Custom.Port
+			if port == nil {
+				port64 = nil
+			} else {
+				portInt64 := int64(*port)
+				port64 = &portInt64
+			}
+			portValue = types.Int64PointerValue(port64)
 		}
 		image = Image{
 			Custom: &Custom{
 				HealthRoute: endpoint.Model.Image.Custom.HealthRoute,
-				Port:        types.Int64PointerValue(port64),
+				Port:        portValue,
 				URL:         endpoint.Model.Image.Custom.URL,
 			},
 		}
@@ -351,18 +394,26 @@ func clientEndpointToProviderEndpoint(endpoint huggingface.EndpointDetails) endp
 			}
 		}
 	} else if endpoint.Model.Image.Tgi != nil {
-		var port64 *int64
-		port := endpoint.Model.Image.Tgi.Port
-		if port == nil {
-			port64 = nil
+		var portValue types.Int64
+		if currentState != nil && currentState.Model.Image.Tgi != nil && !currentState.Model.Image.Tgi.Port.IsNull() && !currentState.Model.Image.Tgi.Port.IsUnknown() {
+			// Preserve the explicitly set value from current state
+			portValue = currentState.Model.Image.Tgi.Port
 		} else {
-			portInt64 := int64(*port)
-			port64 = &portInt64
+			// Use the computed value from API response
+			var port64 *int64
+			port := endpoint.Model.Image.Tgi.Port
+			if port == nil {
+				port64 = nil
+			} else {
+				portInt64 := int64(*port)
+				port64 = &portInt64
+			}
+			portValue = types.Int64PointerValue(port64)
 		}
 		image = Image{
 			Tgi: &Tgi{
 				HealthRoute:           endpoint.Model.Image.Tgi.HealthRoute,
-				Port:                  types.Int64PointerValue(port64),
+				Port:                  portValue,
 				URL:                   endpoint.Model.Image.Tgi.URL,
 				MaxBatchPrefillTokens: endpoint.Model.Image.Tgi.MaxBatchPrefillTokens,
 				MaxBatchTotalTokens:   endpoint.Model.Image.Tgi.MaxBatchTotalTokens,
@@ -373,18 +424,26 @@ func clientEndpointToProviderEndpoint(endpoint huggingface.EndpointDetails) endp
 			},
 		}
 	} else if endpoint.Model.Image.TgiNeuron != nil {
-		var port64 *int64
-		port := endpoint.Model.Image.TgiNeuron.Port
-		if port == nil {
-			port64 = nil
+		var portValue types.Int64
+		if currentState != nil && currentState.Model.Image.TgiNeuron != nil && !currentState.Model.Image.TgiNeuron.Port.IsNull() && !currentState.Model.Image.TgiNeuron.Port.IsUnknown() {
+			// Preserve the explicitly set value from current state
+			portValue = currentState.Model.Image.TgiNeuron.Port
 		} else {
-			portInt64 := int64(*port)
-			port64 = &portInt64
+			// Use the computed value from API response
+			var port64 *int64
+			port := endpoint.Model.Image.TgiNeuron.Port
+			if port == nil {
+				port64 = nil
+			} else {
+				portInt64 := int64(*port)
+				port64 = &portInt64
+			}
+			portValue = types.Int64PointerValue(port64)
 		}
 		image = Image{
 			TgiNeuron: &TgiNeuron{
 				HealthRoute:           endpoint.Model.Image.TgiNeuron.HealthRoute,
-				Port:                  types.Int64PointerValue(port64),
+				Port:                  portValue,
 				URL:                   endpoint.Model.Image.TgiNeuron.URL,
 				MaxBatchPrefillTokens: endpoint.Model.Image.TgiNeuron.MaxBatchPrefillTokens,
 				MaxBatchTotalTokens:   endpoint.Model.Image.TgiNeuron.MaxBatchTotalTokens,
@@ -395,18 +454,26 @@ func clientEndpointToProviderEndpoint(endpoint huggingface.EndpointDetails) endp
 			},
 		}
 	} else if endpoint.Model.Image.Tei != nil {
-		var port64 *int64
-		port := endpoint.Model.Image.Tei.Port
-		if port == nil {
-			port64 = nil
+		var portValue types.Int64
+		if currentState != nil && currentState.Model.Image.Tei != nil && !currentState.Model.Image.Tei.Port.IsNull() && !currentState.Model.Image.Tei.Port.IsUnknown() {
+			// Preserve the explicitly set value from current state
+			portValue = currentState.Model.Image.Tei.Port
 		} else {
-			portInt64 := int64(*port)
-			port64 = &portInt64
+			// Use the computed value from API response
+			var port64 *int64
+			port := endpoint.Model.Image.Tei.Port
+			if port == nil {
+				port64 = nil
+			} else {
+				portInt64 := int64(*port)
+				port64 = &portInt64
+			}
+			portValue = types.Int64PointerValue(port64)
 		}
 		image = Image{
 			Tei: &Tei{
 				HealthRoute:           endpoint.Model.Image.Tei.HealthRoute,
-				Port:                  types.Int64PointerValue(port64),
+				Port:                  portValue,
 				URL:                   endpoint.Model.Image.Tei.URL,
 				MaxBatchTokens:        endpoint.Model.Image.Tei.MaxBatchTokens,
 				MaxConcurrentRequests: endpoint.Model.Image.Tei.MaxConcurrentRequests,
@@ -414,18 +481,26 @@ func clientEndpointToProviderEndpoint(endpoint huggingface.EndpointDetails) endp
 			},
 		}
 	} else if endpoint.Model.Image.Vllm != nil {
-		var port64 *int64
-		port := endpoint.Model.Image.Vllm.Port
-		if port == nil {
-			port64 = nil
+		var portValue types.Int64
+		if currentState != nil && currentState.Model.Image.Vllm != nil && !currentState.Model.Image.Vllm.Port.IsNull() && !currentState.Model.Image.Vllm.Port.IsUnknown() {
+			// Preserve the explicitly set value from current state
+			portValue = currentState.Model.Image.Vllm.Port
 		} else {
-			portInt64 := int64(*port)
-			port64 = &portInt64
+			// Use the computed value from API response
+			var port64 *int64
+			port := endpoint.Model.Image.Vllm.Port
+			if port == nil {
+				port64 = nil
+			} else {
+				portInt64 := int64(*port)
+				port64 = &portInt64
+			}
+			portValue = types.Int64PointerValue(port64)
 		}
 		image = Image{
 			Vllm: &Vllm{
 				HealthRoute:         endpoint.Model.Image.Vllm.HealthRoute,
-				Port:                types.Int64PointerValue(port64),
+				Port:                portValue,
 				URL:                 endpoint.Model.Image.Vllm.URL,
 				KvCacheDtype:        endpoint.Model.Image.Vllm.KvCacheDtype,
 				MaxNumBatchedTokens: endpoint.Model.Image.Vllm.MaxNumBatchedTokens,
@@ -435,13 +510,21 @@ func clientEndpointToProviderEndpoint(endpoint huggingface.EndpointDetails) endp
 		}
 	}
 
-	var timeout64 *int64
-	timeout := endpoint.Compute.Scaling.ScaleToZeroTimeout
-	if timeout == nil {
-		timeout64 = nil
+	var timeoutValue types.Int64
+	if currentState != nil && !currentState.Compute.Scaling.ScaleToZeroTimeout.IsNull() && !currentState.Compute.Scaling.ScaleToZeroTimeout.IsUnknown() {
+		// Preserve the explicitly set value from current state
+		timeoutValue = currentState.Compute.Scaling.ScaleToZeroTimeout
 	} else {
-		timeoutInt := int64(*timeout)
-		timeout64 = &timeoutInt
+		// Use the computed value from API response
+		var timeout64 *int64
+		timeout := endpoint.Compute.Scaling.ScaleToZeroTimeout
+		if timeout == nil {
+			timeout64 = nil
+		} else {
+			timeoutInt := int64(*timeout)
+			timeout64 = &timeoutInt
+		}
+		timeoutValue = types.Int64PointerValue(timeout64)
 	}
 
 	var measure *Measure = nil
@@ -461,7 +544,7 @@ func clientEndpointToProviderEndpoint(endpoint huggingface.EndpointDetails) endp
 			Scaling: Scaling{
 				MaxReplica:         endpoint.Compute.Scaling.MaxReplica,
 				MinReplica:         endpoint.Compute.Scaling.MinReplica,
-				ScaleToZeroTimeout: types.Int64PointerValue(timeout64),
+				ScaleToZeroTimeout: timeoutValue,
 				Measure:            measure,
 			},
 		},
@@ -471,7 +554,7 @@ func clientEndpointToProviderEndpoint(endpoint huggingface.EndpointDetails) endp
 			Repository: endpoint.Model.Repository,
 			Revision:   types.StringPointerValue(endpoint.Model.Revision),
 			Task:       types.StringPointerValue(endpoint.Model.Task),
-			Env:        endpoint.Model.Env,
+			Env:        preserveExplicitEnvVars(endpoint.Model.Env, currentState),
 		},
 		Name: types.StringValue(endpoint.Name),
 		Cloud: Cloud{
@@ -479,10 +562,6 @@ func clientEndpointToProviderEndpoint(endpoint huggingface.EndpointDetails) endp
 			Vendor: endpoint.Provider.Vendor,
 		},
 		Type: types.StringValue(endpoint.Type),
-	}
-
-	if endpoint.Model.Env == nil {
-		providerEndpoint.Model.Env = make(map[string]string)
 	}
 
 	return providerEndpoint
@@ -837,7 +916,7 @@ func (r *endpointResource) Create(ctx context.Context, req resource.CreateReques
 		return
 	}
 
-	plan = clientEndpointToProviderEndpoint(createdEndpoint)
+	plan = clientEndpointToProviderEndpoint(createdEndpoint, &plan)
 
 	diags = resp.State.Set(ctx, plan)
 	resp.Diagnostics.Append(diags...)
@@ -869,7 +948,7 @@ func (r *endpointResource) Read(ctx context.Context, req resource.ReadRequest, r
 		}
 	}
 
-	state = clientEndpointToProviderEndpoint(endpoint)
+	state = clientEndpointToProviderEndpoint(endpoint, &state)
 
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
@@ -886,6 +965,13 @@ func (r *endpointResource) Update(ctx context.Context, req resource.UpdateReques
 		return
 	}
 
+	var state endpointResourceModel
+	diags = req.State.Get(ctx, &state)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
 	endpoint := providerEndpointToUpdateEndpointRequest(plan)
 
 	updatedEndpoint, err := r.client.UpdateEndpoint(plan.Name.ValueString(), endpoint)
@@ -897,7 +983,7 @@ func (r *endpointResource) Update(ctx context.Context, req resource.UpdateReques
 		return
 	}
 
-	plan = clientEndpointToProviderEndpoint(updatedEndpoint)
+	plan = clientEndpointToProviderEndpoint(updatedEndpoint, &state)
 
 	diags = resp.State.Set(ctx, plan)
 	resp.Diagnostics.Append(diags...)

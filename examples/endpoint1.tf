@@ -1,20 +1,17 @@
-resource "huggingface_endpoint" "product_identification_reran_soy" {
-  name = "product-identification-reran-soy"
-
+resource "huggingface_endpoint" "product_ident_reranker_vllm" {
+  name = "product-ident-reranker-vllm-prod"
   compute = {
     accelerator   = "gpu"
     instance_size = "x1"
     instance_type = "nvidia-l4"
     scaling = {
-      min_replica            = 0
-      max_replica            = 1
-      scale_to_zero_timeout  = 60
+      min_replica = 1
+      max_replica = 2
       measure = {
-        hardware_usage = 80.0
+        pending_requests = 10
       }
     }
   }
-
   model = {
     framework = "pytorch"
     image = {
@@ -22,23 +19,20 @@ resource "huggingface_endpoint" "product_identification_reran_soy" {
         port                 = 8000
         url                  = "vllm/vllm-openai:gptoss"
         tensor_parallel_size = 1
-        kv_cache_dtype      = "auto"
+        kv_cache_dtype       = "auto"
       }
     }
     env        = {}
     repository = "sentence-transformers/stsb-roberta-base"
     task       = "text-classification"
-    revision   = "main"
   }
-
   cloud = {
     region = "us-east-1"
     vendor = "aws"
   }
-
   type = "private"
 }
-
-output "product_identification_reran_soy" {
-  value = huggingface_endpoint.product_identification_reran_soy
+output "product_ident_reranker_vllm" {
+  description = "Product identification reranker vLLM"
+  value       = huggingface_endpoint.product_ident_reranker_vllm
 }
