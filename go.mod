@@ -1,13 +1,11 @@
 module terraform-provider-huggingface
 
-go 1.22
-
-toolchain go1.22.3
+go 1.24.0
 
 require (
 	github.com/hashicorp/terraform-plugin-docs v0.19.3
 	github.com/hashicorp/terraform-plugin-framework v1.8.0
-	github.com/hashicorp/terraform-plugin-log v0.9.0
+	github.com/hashicorp/terraform-plugin-log v0.10.0
 	github.com/issamemari/huggingface-endpoints-client-go v1.10.0
 )
 
